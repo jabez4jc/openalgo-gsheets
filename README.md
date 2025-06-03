@@ -87,7 +87,7 @@ creds.json
 
 ## 📝 .env Configuration
 
-Create a `.env` file in the same folder:
+Create a `.env` file in the same folder or rename the sample.env and update it:
 
 ```
 # OpenAlgo Live Feed Configuration
