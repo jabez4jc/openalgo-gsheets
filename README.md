@@ -90,9 +90,15 @@ creds.json
 Create a `.env` file in the same folder:
 
 ```
-OPENALGO_API_KEY=your-api-key-here
+# OpenAlgo Live Feed Configuration
+OPENALGO_API_KEY=Your-OpenAlgo-API-KEY
 GOOGLE_SHEET_NAME=OpenAlgo Live Feed
-POLL_INTERVAL=5
+
+# Polling interval (in seconds)
+POLL_INTERVAL=20
+
+# Optional: Service Account file path
+GOOGLE_CREDS_PATH=creds.json
 ```
 
 > ⚠️ Do not use quotes. Ensure the key was generated after logging in to your broker in the OpenAlgo app.
