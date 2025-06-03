@@ -14,6 +14,8 @@ api_key = os.getenv("OPENALGO_API_KEY")
 sheet_name = os.getenv("GOOGLE_SHEET_NAME", "OpenAlgo Live Feed")
 poll_interval = int(os.getenv("POLL_INTERVAL", "20"))
 
+creds_path = os.getenv("GOOGLE_CREDS_PATH", "creds.json")
+
 if not api_key:
     raise ValueError("❌ OPENALGO_API_KEY not found in .env file.")
 
@@ -24,7 +26,10 @@ client = api(api_key=api_key, host="http://127.0.0.1:5000")
 
 # === Google Sheets Auth ===
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name("creds.json", scope)
+
+# Load Google Sheets credentials
+creds = ServiceAccountCredentials.from_json_keyfile_name(creds_path, scope)
+
 gc = gspread.authorize(creds)
 sheet = gc.open(sheet_name).sheet1
 
