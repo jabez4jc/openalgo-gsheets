@@ -1,10 +1,10 @@
 # 📘 OpenAlgo to Google Sheets Real-Time Market Tracker
 
-This Python project enables real-time **live market data tracking in Google Sheets** using OpenAlgo’s REST API.
+This Python project enables real-time **live market data tracking in Google Sheets** using OpenAlgo’s REST API or Websocket APIs.
 
 It is broker-agnostic and works with any broker supported by OpenAlgo (e.g., Flattrade, Alice Blue, etc.).
 
-It uses **HTTP polling** (instead of WebSocket) and updates each row per symbol in a dashboard-style Google Sheet.
+Track live market data from OpenAlgo API directly into Google Sheets using either HTTP polling or WebSocket streaming.
 
 ---
 
@@ -24,9 +24,43 @@ It uses **HTTP polling** (instead of WebSocket) and updates each row per symbol 
 | Reason              | Explanation                                              |
 | ------------------- | -------------------------------------------------------- |
 | ✅ Broker-Agnostic   | REST API is supported for **all brokers** in OpenAlgo    |
-| ❌ WebSocket Limit   | WebSocket only works with AngelOne (as of June 2025)     |
+| ✅ WebSocket Limit   | WebSocket only works with AngelOne (as of June 2025)     |
 | ✅ Sheets Friendly   | Google Sheets are not built for high-frequency tick data |
 | ✅ Simple & Reliable | Easy to set up, debug, and extend                        |
+
+---
+
+## ⚙️ WebSocket Version (`openalgo_live_dashboard_ws.py`)
+
+### ✅ What It Does:
+- Connects to OpenAlgo WebSocket server
+- Subscribes to live LTP quote updates
+- Dynamically tracks instruments across:
+  - `Equity`
+  - `Futures`
+  - `Options`
+  - `Currency`
+  - `Commodities`
+- Updates only when ticks arrive (no polling)
+- Updates Google Sheets with:
+  - LTP, Δ, Open, High, Low, Volume, Timestamp, Prev Close, % Change
+  - Conditional formatting (green/red rows)
+
+### 🧪 Sheets Setup:
+- Each sheet must be named exactly: `Equity`, `Futures`, `Options`, etc.
+- Sheet tab must be `Sheet1`
+- Headers in row 1 must be:
+
+  ```text
+  Exchange | Symbol | LTP | Δ | Open | High | Low | Volume | Timestamp | Prev Close | % Change
+  ```
+
+- Rows 2+ should have `Exchange` and `Symbol`; other fields are auto-filled.
+
+---
+
+## 💡 Tip: Fallback to HTTP Polling
+Use `openalgo_live_dashboard.py` if WebSocket is not available (e.g. firewall, offline mode). This version polls `client.quotes()` every `POLL_INTERVAL` seconds.
 
 ---
 
@@ -47,6 +81,7 @@ It uses **HTTP polling** (instead of WebSocket) and updates each row per symbol 
 ├── .env
 ├── creds.json
 ├── openalgo_live_dashboard.py
+├── openalgo_live_dashboard_ws.py
 ├── requirements.txt
 └── README.md
 ```
@@ -94,10 +129,10 @@ Create a `.env` file in the same folder or rename the sample.env and update it:
 OPENALGO_API_KEY=Your-OpenAlgo-API-KEY
 GOOGLE_SHEET_NAME=OpenAlgo Live Feed
 
-# Polling interval (in seconds)
+# Polling interval (in seconds) for http requests
 POLL_INTERVAL=20
 
-# Optional: Service Account file path
+# Service Account file path
 GOOGLE_CREDS_PATH=creds.json
 ```
 
@@ -105,19 +140,24 @@ GOOGLE_CREDS_PATH=creds.json
 
 ---
 
-## ▶️ Run
+## 🔧 Setup Instructions
 
-Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-Run the script:
-
+1. Clone the repo
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Prepare your `.env` file
+4. Place your `creds.json` (Google Service Account key) in the root folder.
+5. Run the script:
 ```bash
 python openalgo_live_dashboard.py
 ```
+for HTTP Polling for all brokers or
+```bash
+python openalgo_live_dashboard_ws.py
+```
+for AngelOne using Websockets.
 
 ---
 
